@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 7. Dark/Light Theme Switcher Logic
   // ==========================================
   const themeToggleBtn = document.getElementById('theme-toggle');
-  const themeIcon = themeToggleBtn.querySelector('i');
+  const themeIcon = themeToggleBtn ? themeToggleBtn.querySelector('i') : null;
 
   const savedTheme = localStorage.getItem('theme');
   const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -234,26 +234,32 @@ document.addEventListener('DOMContentLoaded', () => {
     enableDarkMode();
   }
 
-  themeToggleBtn.addEventListener('click', () => {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    if (currentTheme === 'light') {
-      enableDarkMode();
-    } else {
-      enableLightTheme();
-    }
-  });
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      if (currentTheme === 'light') {
+        enableDarkMode();
+      } else {
+        enableLightTheme();
+      }
+    });
+  }
 
   function enableLightTheme() {
     document.documentElement.setAttribute('data-theme', 'light');
-    themeIcon.classList.remove('fa-moon');
-    themeIcon.classList.add('fa-sun');
+    if (themeIcon) {
+      themeIcon.classList.remove('fa-moon');
+      themeIcon.classList.add('fa-sun');
+    }
     localStorage.setItem('theme', 'light');
   }
 
   function enableDarkMode() {
     document.documentElement.removeAttribute('data-theme');
-    themeIcon.classList.remove('fa-sun');
-    themeIcon.classList.add('fa-moon');
+    if (themeIcon) {
+      themeIcon.classList.remove('fa-sun');
+      themeIcon.classList.add('fa-moon');
+    }
     localStorage.setItem('theme', 'dark');
   }
 
@@ -287,100 +293,93 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }, observerOptions);
 
-  const cards = document.querySelectorAll('.project-card, .skill-category, .contact-container, .terminal-card');
+  const cards = document.querySelectorAll('.project-card, .skill-category, .contact-container, .terminal-card, .api-lab-container');
   cards.forEach(card => {
     card.style.opacity = '0';
     card.style.transform = 'translateY(30px)';
     card.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
     revealOnScroll.observe(card);
   });
-cards.forEach(card => {
-      card.style.opacity = '0';
-      card.style.transform = 'translateY(30px)';
-      card.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
-      revealOnScroll.observe(card);
+
+  // ==========================================
+  // 9. Interactive API Test Lab Logic
+  // ==========================================
+  const endpointSelect = document.getElementById('api-endpoint-select');
+  const methodBadge = document.getElementById('api-method-badge');
+  const urlDisplay = document.getElementById('api-url-display');
+  const runApiBtn = document.getElementById('run-api-btn');
+  const responseStatus = document.getElementById('response-status');
+  const jsonOutput = document.getElementById('json-output');
+
+  const mockApiData = {
+    catalog: {
+      method: "GET",
+      url: "https://api.daniel.dev/v1/products?category=e-commerce",
+      status: "200 OK",
+      response: {
+        status: 200,
+        message: "Catalog payload retrieved successfully",
+        total_items: 3,
+        data: [
+          { id: "DEM-01", name: "Demfati Enterprise Storefront", stack: "PHP / Custom CMS", active: true },
+          { id: "KAI-02", name: "Kaiglo Multi-Vendor Portal", stack: "Full-Stack / REST API", active: true },
+          { id: "WAZ-03", name: "Waziri Superstore System", stack: "E-Commerce / Gateways", active: true }
+        ]
+      }
+    },
+    checkout: {
+      method: "POST",
+      url: "https://api.daniel.dev/v1/checkout/process-order",
+      status: "201 Created",
+      response: {
+        status: 201,
+        transaction_id: "tx_9874125638",
+        currency: "NGN",
+        gateway: "Paystack / Flutterwave Integrated",
+        payment_status: "SUCCESSFUL",
+        timestamp: new Date().toISOString()
+      }
+    },
+    webhook: {
+      method: "POST",
+      url: "https://api.daniel.dev/v1/webhooks/solana-transfer",
+      status: "200 OK",
+      response: {
+        status: 200,
+        event: "TOKEN_TRANSFER_EXECUTED",
+        network: "Solana Mainnet",
+        signature: "5Kn...9xZq",
+        webhook_status: "DELIVERED",
+        execution_time: "142ms"
+      }
+    }
+  };
+
+  if (endpointSelect && runApiBtn) {
+    endpointSelect.addEventListener('change', (e) => {
+      const selected = mockApiData[e.target.value];
+      methodBadge.textContent = selected.method;
+      methodBadge.className = `method-badge ${selected.method.toLowerCase()}`;
+      urlDisplay.textContent = selected.url;
     });
 
-    // ==========================================
-    // Interactive API Test Lab Logic
-    // ==========================================
-    const endpointSelect = document.getElementById('api-endpoint-select');
-    const methodBadge = document.getElementById('api-method-badge');
-    const urlDisplay = document.getElementById('api-url-display');
-    const runApiBtn = document.getElementById('run-api-btn');
-    const responseStatus = document.getElementById('response-status');
-    const jsonOutput = document.getElementById('json-output');
+    runApiBtn.addEventListener('click', () => {
+      const selected = mockApiData[endpointSelect.value];
+      
+      runApiBtn.disabled = true;
+      runApiBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Processing...`;
+      jsonOutput.textContent = "// Sending asynchronous HTTP request...";
+      responseStatus.textContent = "Status: 102 Processing";
+      responseStatus.className = "status-badge ready";
 
-    const mockApiData = {
-      catalog: {
-        method: "GET",
-        url: "https://api.daniel.dev/v1/products?category=e-commerce",
-        status: "200 OK",
-        response: {
-          status: 200,
-          message: "Catalog payload retrieved successfully",
-          total_items: 3,
-          data: [
-            { id: "DEM-01", name: "Demfati Enterprise Storefront", stack: "PHP / Custom CMS", active: true },
-            { id: "KAI-02", name: "Kaiglo Multi-Vendor Portal", stack: "Full-Stack / REST API", active: true },
-            { id: "WAZ-03", name: "Waziri Superstore System", stack: "E-Commerce / Gateways", active: true }
-          ]
-        }
-      },
-      checkout: {
-        method: "POST",
-        url: "https://api.daniel.dev/v1/checkout/process-order",
-        status: "201 Created",
-        response: {
-          status: 201,
-          transaction_id: "tx_9874125638",
-          currency: "NGN",
-          gateway: "Paystack / Flutterwave Integrated",
-          payment_status: "SUCCESSFUL",
-          timestamp: new Date().toISOString()
-        }
-      },
-      webhook: {
-        method: "POST",
-        url: "https://api.daniel.dev/v1/webhooks/solana-transfer",
-        status: "200 OK",
-        response: {
-          status: 200,
-          event: "TOKEN_TRANSFER_EXECUTED",
-          network: "Solana Mainnet",
-          signature: "5Kn...9xZq",
-          webhook_status: "DELIVERED",
-          execution_time: "142ms"
-        }
-      }
-    };
+      setTimeout(() => {
+        runApiBtn.disabled = false;
+        runApiBtn.innerHTML = `<i class="fa-solid fa-play"></i> Execute Request`;
+        responseStatus.textContent = `Status: ${selected.status}`;
+        responseStatus.className = "status-badge success";
+        jsonOutput.textContent = JSON.stringify(selected.response, null, 2);
+      }, 700);
+    });
+  }
 
-    if (endpointSelect && runApiBtn) {
-      endpointSelect.addEventListener('change', (e) => {
-        const selected = mockApiData[e.target.value];
-        methodBadge.textContent = selected.method;
-        methodBadge.className = `method-badge ${selected.method.toLowerCase()}`;
-        urlDisplay.textContent = selected.url;
-      });
-
-      runApiBtn.addEventListener('click', () => {
-        const selected = mockApiData[endpointSelect.value];
-        
-        runApiBtn.disabled = true;
-        runApiBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Processing...`;
-        jsonOutput.textContent = "// Sending asynchronous HTTP request...";
-        responseStatus.textContent = "Status: 102 Processing";
-        responseStatus.className = "status-badge ready";
-
-        setTimeout(() => {
-          runApiBtn.disabled = false;
-          runApiBtn.innerHTML = `<i class="fa-solid fa-play"></i> Execute Request`;
-          responseStatus.textContent = `Status: ${selected.status}`;
-          responseStatus.className = "status-badge success";
-          jsonOutput.textContent = JSON.stringify(selected.response, null, 2);
-        }, 700);
-      });
-    }
-
-  });
 });

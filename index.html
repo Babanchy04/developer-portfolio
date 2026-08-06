@@ -220,6 +220,44 @@
     </div>
   </section>
 
+  <!-- API & Systems Test Lab Section -->
+  <section id="api-lab" class="api-lab-section">
+    <div class="section-title">
+      <h2><i class="fa-solid fa-flask"></i> Interactive API Test Lab</h2>
+      <p>Test real-time endpoint simulations, payload formatting, and asynchronous response handling.</p>
+    </div>
+
+    <div class="api-lab-container">
+      <!-- Control Panel -->
+      <div class="api-controls">
+        <label for="api-endpoint-select">Select Endpoint Simulation:</label>
+        <select id="api-endpoint-select" class="api-select">
+          <option value="catalog">GET /api/v1/products?category=e-commerce</option>
+          <option value="checkout">POST /api/v1/checkout/process-order</option>
+          <option value="webhook">POST /api/v1/webhooks/solana-transfer</option>
+        </select>
+        
+        <div class="api-request-details">
+          <span id="api-method-badge" class="method-badge get">GET</span>
+          <span id="api-url-display" class="url-display">https://api.daniel.dev/v1/products</span>
+        </div>
+
+        <button id="run-api-btn" class="btn-primary magnetic-btn">
+          <i class="fa-solid fa-play"></i> Execute Request
+        </button>
+      </div>
+
+      <!-- Live Terminal / JSON Response Window -->
+      <div class="api-response-window">
+        <div class="response-header">
+          <span class="response-title">HTTP Response Console</span>
+          <span id="response-status" class="status-badge ready">Status: 200 OK</span>
+        </div>
+        <pre id="json-output" class="json-output"><code>// Click "Execute Request" to trigger backend simulation...</code></pre>
+      </div>
+    </div>
+  </section>
+
   <!-- Contact Section with Live Form -->
   <section id="contact" class="contact-section">
     <div class="section-title">
