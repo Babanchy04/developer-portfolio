@@ -505,20 +505,25 @@ body {
   color: var(--text-main);
 }
 
-/* Screenshot Preview Image Container */
+/* Drawer Image Wrapper */
+/* Drawer Image Wrapper */
 .drawer-image-wrapper {
   width: 100%;
-  height: 220px;
-  border-radius: 8px;
+  height: 250px;             /* 👈 Change max-height to a fixed height */
+  border-radius: 10px;
   overflow: hidden;
-  border: 1px solid var(--border-color);
-  background-color: var(--card-bg);
+  margin: 1.2rem 0;
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  background-color: #0d1117;
 }
 
+/* Drawer Image */
 .drawer-image-wrapper img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: cover;         /* Fills the container nicely */
+  object-position: top;      /* Keeps the top header of the website screenshot visible */
+  display: block;
 }
 
 .drawer-section h3 {
