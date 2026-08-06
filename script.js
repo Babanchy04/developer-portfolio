@@ -393,14 +393,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
 
-      // Calculate relative percentage position for radial glow
       const mouseXPercent = (x / rect.width) * 100;
       const mouseYPercent = (y / rect.height) * 100;
 
       card.style.setProperty('--mouse-x', `${mouseXPercent}%`);
       card.style.setProperty('--mouse-y', `${mouseYPercent}%`);
 
-      // Calculate tilt degrees (Max tilt angle: 8deg)
       const centerX = rect.width / 2;
       const centerY = rect.height / 2;
       const rotateX = ((y - centerY) / centerY) * -8;
@@ -414,9 +412,39 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     card.addEventListener('mouseleave', () => {
-      card.style.style = '';
       card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
       card.style.transition = 'transform 0.5s ease-out';
     });
   });
+
+  // ==========================================
+  // 11. Live Design System Accent Switcher Logic
+  // ==========================================
+  const accentDots = document.querySelectorAll('.accent-dot');
+  const savedAccent = localStorage.getItem('user-accent-color');
+
+  if (savedAccent) {
+    applyAccentColor(savedAccent);
+  }
+
+  accentDots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      const color = dot.getAttribute('data-color');
+      applyAccentColor(color);
+    });
+  });
+
+  function applyAccentColor(color) {
+    document.documentElement.style.setProperty('--accent-color', color);
+    localStorage.setItem('user-accent-color', color);
+
+    accentDots.forEach(dot => {
+      if (dot.getAttribute('data-color') === color) {
+        dot.classList.add('active');
+      } else {
+        dot.classList.remove('active');
+      }
+    });
+  }
+
 });
