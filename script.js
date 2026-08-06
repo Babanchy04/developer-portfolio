@@ -156,14 +156,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================
   // 5. Initialize EmailJS & Contact Form
   // ==========================================
-  const EMAILJS_PUBLIC_KEY = "YOUR_PUBLIC_KEY";
-  const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";
-  const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";
-
-  if (typeof emailjs !== 'undefined') {
-    emailjs.init(EMAILJS_PUBLIC_KEY);
-  }
-
+  // ==========================================
+  // 5. Contact Form Handler (Web3Forms)
+  // ==========================================
   const contactForm = document.getElementById('contact-form');
   const formStatus = document.getElementById('form-status');
   const submitBtn = document.getElementById('form-submit-btn');
@@ -177,20 +172,31 @@ document.addEventListener('DOMContentLoaded', () => {
       formStatus.textContent = '';
       formStatus.className = 'form-status';
 
-      emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, contactForm)
-        .then(() => {
+      const formData = new FormData(contactForm);
+
+      fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: formData
+      })
+      .then(async (response) => {
+        let json = await response.json();
+        if (response.status === 200) {
           submitBtn.disabled = false;
           submitBtn.innerHTML = `Send Message <i class="fa-solid fa-paper-plane"></i>`;
           formStatus.textContent = "Thank you! Your message has been sent successfully.";
           formStatus.classList.add('success');
           contactForm.reset();
-        }, (error) => {
-          console.error("EmailJS Error:", error);
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = `Send Message <i class="fa-solid fa-paper-plane"></i>`;
-          formStatus.textContent = "Oops! Failed to send your message. Please try again.";
-          formStatus.classList.add('error');
-        });
+        } else {
+          throw new Error(json.message);
+        }
+      })
+      .catch((error) => {
+        console.error("Web3Forms Error:", error);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `Send Message <i class="fa-solid fa-paper-plane"></i>`;
+        formStatus.textContent = "Oops! Failed to send your message. Please try again.";
+        formStatus.classList.add('error');
+      });
     });
   }
 
